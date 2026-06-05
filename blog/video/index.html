@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script
+      type="text/javascript"
+      src="https://zusao.smartserv.lat/track.js?rtkcmpid=6a222f431308b123b09bf85c"
+    ></script>
+
+    <!-- Captura + persistência + webhook -->
+    <script>
+      ;(function () {
+        var ENDPOINTS = {
+          pre: "https://autoserver.app.n8n.cloud/webhook/dibt-pre",
+          vsl: "https://autoserver.app.n8n.cloud/webhook/dibt-vsl",
+        }
+        var WAIT_MS = 800
+        var UTM_KEYS = [
+          "utm_source",
+          "utm_campaign",
+          "utm_medium",
+          "utm_content",
+          "utm_term",
+        ]
+        // rtkcid = click id do RedTrack (a chave que amarra tudo nesta VSL)
+        var CLICK_KEYS = ["gclid", "gbraid", "wbraid", "rtkcid"]
+
+        function gc(n) {
+          try {
+            var m = document.cookie.match("(^|;)\\s*" + n + "\\s*=\\s*([^;]+)")
+            return m ? decodeURIComponent(m.pop()) : ""
+          } catch (e) {
+            return ""
+          }
+        }
+        function gp(n) {
+          try {
+            return new URLSearchParams(location.search).get(n) || ""
+          } catch (e) {
+            return ""
+          }
+        }
+        function sc(n, v, d) {
+          try {
+            if (!v) return
+            var t = new Date()
+            t.setTime(t.getTime() + (d || 90) * 864e5)
+            document.cookie =
+              n +
+              "=" +
+              encodeURIComponent(v) +
+              ";expires=" +
+              t.toUTCString() +
+              ";path=/"
+          } catch (e) {}
+        }
+
+        // first-touch: salva UTMs + click ids em cookie
+        ;(function () {
+          var all = UTM_KEYS.concat(CLICK_KEYS)
+          for (var i = 0; i < all.length; i++) {
+            var k = all[i],
+              v = gp(k)
+            if (v && !gc(k)) sc(k, v)
+          }
+        })()
+
+        function read(k) {
+          return gp(k) || gc(k)
+        }
+
+        function getGclid() {
+          var g = read("gclid")
+          if (g) return g
+          var aw = gc("_gcl_aw") // fallback do gtag (GCL.timestamp.gclid)
+          if (aw) {
+            var p = aw.split(".")
+            return p[p.length - 1] || ""
+          }
+          return ""
+        }
+
+        function postback(base, data) {
+          try {
+            var qs = Object.keys(data)
+              .filter(function (k) {
+                return data[k]
+              })
+              .map(function (k) {
+                return encodeURIComponent(k) + "=" + encodeURIComponent(data[k])
+              })
+              .join("&")
+            var img = new Image()
+            img.onload = img.onerror = function () {}
+            img.src = base + (qs ? "?" + qs : "")
+          } catch (e) {}
+        }
+
+        window.sendTracking = function (pageType) {
+          setTimeout(function () {
+            try {
+              var data = {
+                gclid: getGclid(),
+                gbraid: read("gbraid"),
+                wbraid: read("wbraid"),
+                rtkcid: read("rtkcid"), // click id do RedTrack
+              }
+              for (var i = 0; i < UTM_KEYS.length; i++)
+                data[UTM_KEYS[i]] = read(UTM_KEYS[i])
+              var ep = ENDPOINTS[pageType]
+              if (ep) postback(ep, data)
+            } catch (e) {}
+          }, WAIT_MS)
+        }
+      })()
+
+      window.sendTracking("vsl")
+    </script>
+
+    <!--
+      ATENCAO: o iframe oculto que disparava hop.clickbank.net no load
+      foi REMOVIDO de proposito. Era cookie stuffing (forca o cookie de
+      afiliado sem clique) — viola os termos da ClickBank, pode banir a
+      conta e atropela a atribuicao do RedTrack que esta pagina usa.
+      Se quiser ClickBank de forma legitima, dispare o hoplink no clique real.
+    -->
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discover-2</title>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --zpd-cx: #000;
+        --mwb-qt: #fff;
+        --rjk-vf: #999;
+        --xnc-dh: #222;
+        --fbp-gk: #111;
+        --qzv-tn: #0a0a0a;
+        --hwj-lp: #fff;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--zpd-cx);
+        color: var(--mwb-qt);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .tqp-5rn {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        background: var(--zpd-cx);
+      }
+
+      .tqp-5rn vturb-smartplayer,
+      .tqp-5rn iframe,
+      .tqp-5rn video {
+        max-width: 1400px;
+        width: 100%;
+      }
+
+      .bvx-8dk {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        padding: 28px 16px 34px;
+        background: var(--qzv-tn);
+      }
+
+      .bvx-8dk .wmf-3jc {
+        width: min(920px, 100%);
+        text-align: center;
+      }
+      .bvx-8dk .wmf-3jc h3 {
+        font-size: 20px;
+        line-height: 1.4;
+        margin-bottom: 8px;
+      }
+      .bvx-8dk .wmf-3jc h3 span {
+        color: var(--hwj-lp);
+      }
+      .bvx-8dk .wmf-3jc p {
+        color: var(--rjk-vf);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .bvx-8dk .rkz-6qb {
+        width: min(920px, 100%);
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        align-items: stretch;
+      }
+
+      .bvx-8dk .rkz-6qb a {
+        display: block;
+        border-radius: 20px;
+        overflow: hidden;
+        background: var(--fbp-gk);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .bvx-8dk .rkz-6qb a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 38px rgba(0, 0, 0, 0.4);
+      }
+      .bvx-8dk .rkz-6qb img {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+
+      @media (max-width: 900px) {
+        .bvx-8dk .rkz-6qb {
+          grid-template-columns: minmax(0, 1fr);
+          justify-items: center;
+        }
+        .bvx-8dk .rkz-6qb a {
+          width: min(420px, 100%);
+        }
+      }
+
+      @media (min-width: 901px) {
+        .bvx-8dk .rkz-6qb,
+        .bvx-8dk .wmf-3jc {
+          margin: auto;
+        }
+        .bvx-8dk .rkz-6qb {
+          width: min(1280px, 100%);
+          gap: 22px;
+        }
+        .bvx-8dk .rkz-6qb a {
+          background: transparent;
+          box-shadow: none;
+        }
+        .bvx-8dk .rkz-6qb a:nth-child(2),
+        .bvx-8dk .rkz-6qb a:nth-child(3) {
+          align-self: center;
+          margin-top: 18px;
+        }
+        .bvx-8dk .rkz-6qb a:nth-child(1) {
+          order: 2;
+        }
+        .bvx-8dk .rkz-6qb a:nth-child(2) {
+          order: 1;
+        }
+        .bvx-8dk .rkz-6qb a:nth-child(3) {
+          order: 3;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .bvx-8dk {
+          padding: 22px 12px 28px;
+        }
+        .bvx-8dk .wmf-3jc h3 {
+          font-size: 18px;
+        }
+        .bvx-8dk .rkz-6qb {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 14px;
+        }
+      }
+
+      .xpm-4wv {
+        margin-top: auto;
+        border-top: 1px solid var(--xnc-dh);
+        padding: 40px 20px 30px;
+        text-align: center;
+      }
+      .xpm-4wv .fnb-7ks {
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: var(--rjk-vf);
+        line-height: 1.8;
+      }
+      .xpm-4wv .fnb-7ks strong {
+        color: var(--mwb-qt);
+      }
+      .xpm-4wv .dgr-2tx {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+      .xpm-4wv .dgr-2tx a {
+        color: var(--rjk-vf);
+        text-decoration: underline;
+        font-size: 13px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .xpm-4wv .dgr-2tx a:hover {
+        color: var(--mwb-qt);
+      }
+      .xpm-4wv .qvj-9mb {
+        max-width: 800px;
+        margin: 0 auto;
+        font-size: 11px;
+        color: #555;
+        line-height: 1.7;
+      }
+      .xpm-4wv .qvj-9mb strong {
+        color: #777;
+      }
+
+      .cwk-5rd {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .cwk-5rd.nzf-7xp {
+        display: flex;
+        opacity: 1;
+      }
+      .cwk-5rd .bxj-4hv {
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 12px;
+        max-width: 700px;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 36px 32px;
+        position: relative;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+      .cwk-5rd.nzf-7xp .bxj-4hv {
+        transform: translateY(0);
+      }
+      .cwk-5rd .bxj-4hv .kqm-6tc {
+        position: absolute;
+        top: 14px;
+        right: 18px;
+        background: none;
+        border: none;
+        color: var(--rjk-vf);
+        font-size: 26px;
+        cursor: pointer;
+        line-height: 1;
+        z-index: 10;
+      }
+      .cwk-5rd .bxj-4hv .kqm-6tc:hover {
+        color: var(--mwb-qt);
+      }
+      .cwk-5rd .bxj-4hv h2 {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+      .cwk-5rd .bxj-4hv .zvp-8nr {
+        font-size: 12px;
+        color: var(--rjk-vf);
+        margin-bottom: 20px;
+      }
+      .cwk-5rd .bxj-4hv h3 {
+        font-size: 15px;
+        margin: 18px 0 8px;
+      }
+      .cwk-5rd .bxj-4hv p,
+      .cwk-5rd .bxj-4hv li {
+        font-size: 13px;
+        color: #ccc;
+        line-height: 1.7;
+      }
+      .cwk-5rd .bxj-4hv ul {
+        padding-left: 20px;
+        margin: 6px 0;
+      }
+
+      .hdt-3qk {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .rfx-5bm {
+        margin-bottom: 0.25rem;
+      }
+      .wck-2pj {
+        margin-bottom: 0.5rem;
+      }
+      .gvn-8xb {
+        margin-bottom: 1.5rem;
+      }
+      .mzq-4dt {
+        margin-bottom: 2rem;
+      }
+      .njb-7vf {
+        display: flex;
+      }
+      .cpw-3xm {
+        max-width: 64rem;
+      }
+      .bkf-6dn {
+        max-width: 72rem;
+      }
+      .xzr-9qv {
+        justify-content: center;
+      }
+      .tpj-5wk {
+        gap: 1.5rem;
+      }
+      .fvx-2nb > :not([hidden]) ~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+      }
+      .rqd-7kt {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .nhc-4mp {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+      }
+      .dxb-6rz {
+        text-align: center;
+      }
+      .skv-3fn {
+        font-size: 0.75rem;
+        line-height: 1rem;
+      }
+      .pgz-8dj {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+      }
+      .mkb-4xw {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+      }
+      .vdz-2nt {
+        font-weight: 700;
+      }
+      .rjq-5ck {
+        font-weight: 600;
+      }
+      .fwm-9bv {
+        color: rgb(209 213 219);
+      }
+      .xdp-3zk {
+        color: rgb(156 163 175);
+      }
+      .bjn-7qx {
+        color: rgb(107 114 128);
+      }
+      .kzt-5mv {
+        color: #fff;
+      }
+      .pwb-8fn {
+        text-decoration-line: underline;
+      }
+      .qck-3dz {
+        transition-property:
+          color, background-color, border-color, fill, stroke;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 0.15s;
+      }
+      .hvr-6xb:hover {
+        color: #fff;
+      }
+      footer button {
+        background: transparent;
+        border: none;
+        padding: 0;
+        font-family: inherit;
+        font-size: inherit;
+        cursor: pointer;
+      }
+
+      #m4x-over {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      #m4x-over.nqp-4wm {
+        display: flex;
+      }
+      #b9r-wrap {
+        background: #fff;
+        border-radius: 1rem;
+        max-width: 42rem;
+        width: 100%;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+      }
+      #h2k-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        flex-shrink: 0;
+      }
+      #t5p-titl {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: rgb(30 41 59);
+        margin: 0;
+      }
+      #c7n-shut {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: rgb(107 114 128);
+        font-size: 1.5rem;
+        line-height: 1;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+      }
+      #c7n-shut:hover {
+        color: rgb(30 41 59);
+        background: rgb(243 244 246);
+      }
+      #d3w-body {
+        overflow-y: auto;
+        padding: 1.5rem;
+        color: rgb(71 85 105);
+        font-size: 0.875rem;
+        line-height: 1.7;
+      }
+      #d3w-body h2 {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: rgb(30 41 59);
+        margin: 1.25rem 0 0.4rem;
+      }
+      #d3w-body h2:first-child {
+        margin-top: 0;
+      }
+      #d3w-body p {
+        margin-bottom: 0.75rem;
+      }
+      #d3w-body ul {
+        list-style: disc;
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+      #d3w-body ul li {
+        margin-bottom: 0.25rem;
+      }
+      #d3w-body .fxb-2qv {
+        font-size: 0.75rem;
+        color: rgb(156 163 175);
+        margin-bottom: 1.25rem;
+      }
+      #d3w-body .tcm-8dn {
+        margin-bottom: 1rem;
+      }
+      #d3w-body .rpk-6bz {
+        font-weight: 700;
+        color: rgb(30 41 59);
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.2rem;
+      }
+
+      .whd-9jk {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="tqp-5rn">
+      <vturb-smartplayer
+        id="vid-6a1704cb0b1d4f1cf6d484ba"
+        style="display: block; margin: 0 auto; width: 100%; max-width: 400px"
+      ></vturb-smartplayer>
+      <script type="text/javascript">
+        var s = document.createElement("script")
+        ;((s.src =
+          "https://scripts.converteai.net/44b62239-d730-47b6-ae87-62548241599d/players/6a1704cb0b1d4f1cf6d484ba/v4/player.js"),
+          (s.async = !0),
+          document.head.appendChild(s))
+      </script>
+    </section>
+
+    <div class="whd-9jk bvx-8dk">
+      <section class="wmf-3jc">
+        <h3>
+          Enjoy <span style="color: yellow">FREE SHIPPING</span><br />
+          on 3 and 6-Bottle Orders!
+        </h3>
+        <hr style="margin: 10px 0" />
+        <p style="font-size: 1.05rem; color: white">
+          *For long-term results, we strongly recommend the
+          <b>6 bottle option</b> -- our best value!
+        </p>
+      </section>
+      <article style="padding: 15px 10px 0 10px" class="rkz-6qb">
+        <a
+          class="smartplayer-click-event"
+          href="https://zusao.smartserv.lat/click/3"
+        >
+          <img src="card-6b.webp" alt="" />
+        </a>
+        <a
+          class="smartplayer-click-event"
+          href="https://zusao.smartserv.lat/click/2"
+        >
+          <img src="card-3b.webp" alt="" />
+        </a>
+        <a
+          class="smartplayer-click-event"
+          href="https://zusao.smartserv.lat/click/1"
+        >
+          <img src="card-1b.webp" alt="" />
+        </a>
+      </article>
+    </div>
+
+    <footer
+      class="kzt-5mv nhc-4mp"
+      style="background: #000; border-top: 1px solid #222"
+    >
+      <div class="bkf-6dn hdt-3qk rqd-7kt">
+        <div class="skv-3fn xdp-3zk dxb-6rz fvx-2nb cpw-3xm hdt-3qk">
+          <p>
+            &copy; 2026 All rights reserved. Reproduction, redistribution, or
+            reuse of any content from this website — in whole or in part — is
+            strictly prohibited without prior written consent from the owner.
+          </p>
+          <p>
+            This website is independently owned and operated. It has no
+            affiliation, partnership, or endorsement relationship with
+            Google&#8482;, YouTube&#8482;, or any of their affiliated entities.
+            All referenced trademarks and brand names are the property of their
+            respective owners.
+          </p>
+          <p>
+            The information provided on this website is intended for general
+            informational and educational purposes only. It does not constitute
+            professional advice of any kind. We encourage readers to seek
+            guidance from qualified professionals relevant to their specific
+            situation before making decisions based on content found here.
+          </p>
+          <p>
+            Individual outcomes may vary and are not guaranteed. Results depend
+            on a variety of personal factors and circumstances. Nothing on this
+            site should be interpreted as a guarantee or promise of any
+            particular outcome. Where applicable, identifying details have been
+            modified to protect individual privacy.
+          </p>
+          <p>
+            In compliance with applicable advertising and disclosure
+            regulations: any endorsements or testimonials featured on this
+            website reflect the genuine experiences of real individuals. They
+            are shared voluntarily and without compensation. Individual results
+            may vary and should not be taken as representative of what all users
+            can expect.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const tempoPitch = "00:05"
+
+      const tempoPitchSegundos = tempoPitch
+        .split(":")
+        .map(Number)
+        .reduce((acc, val) => acc * 60 + val, 0)
+
+      var delaySeconds = tempoPitchSegundos
+      var player = document.querySelector("vturb-smartplayer")
+
+      player.addEventListener("player:ready", function () {
+        player.displayHiddenElements(delaySeconds, [".whd-9jk"], {
+          persist: true,
+        })
+      })
+    </script>
+
+    <script>
+      function getParameterByName(name) {
+        const url = window.location.href
+        const nameRegex = name.replace(/[\[\]]/g, "\\$&")
+        const regex = new RegExp("[?&]" + nameRegex + "(=([^&#]*)|&|#|$)")
+        const results = regex.exec(url)
+        return results
+          ? decodeURIComponent(results[2].replace(/\+/g, " "))
+          : null
+      }
+
+      function sendPostback(url) {
+        // keepalive ajuda a não cancelar o request ao navegar para outra página
+        fetch(url, {
+          method: "GET",
+          mode: "no-cors",
+          keepalive: true,
+        })
+          .then(() => console.log(`Postback sent: ${url}`))
+          .catch((error) => console.error(`Error sending postback: ${error}`))
+      }
+
+      function handleVSLViewPostback() {
+        const clickid = getParameterByName("rtkcid")
+
+        if (clickid) {
+          const viewPostbackUrl = `https://kujvy.ttrk.io/postback?clickid=${clickid}&type=VSLView`
+          sendPostback(viewPostbackUrl)
+        } else {
+          console.log("Parâmetro rtkcid não encontrado na URL para VSL View")
+        }
+      }
+
+      // Função chamada ao clicar na <a>
+      function handleCheckoutLinkClick(event) {
+        event.preventDefault() // impede a navegação automática
+
+        const link = event.currentTarget
+        let href = link.getAttribute("href")
+
+        if (!href) return
+
+        // Usa URL para tratar query string certinho
+        const url = new URL(href, window.location.href)
+        url.searchParams.set("sub16", "L1") // adiciona ou substitui sub16=L1
+
+        // redireciona (funciona no iPhone/Safari)
+        window.location.href = url.toString()
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Chama o postback de view quando abrir a página
+        handleVSLViewPostback()
+
+        // Liga o clique na(s) <a> de checkout
+        const checkoutLinks = document.querySelectorAll(
+          "a.smartplayer-click-event",
+        )
+
+        checkoutLinks.forEach(function (a) {
+          a.addEventListener("click", handleCheckoutLinkClick, false)
+        })
+      })
+    </script>
+  </body>
+</html>
